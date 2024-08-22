@@ -1,0 +1,10 @@
+aiogram
+pydantic
+pydantic-settings
+Django
+SQLAlchemy
+split-settings
+environs
+psycopg2
+django-unfold
+pytz
