@@ -1,12 +1,14 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
 from aiogram.utils.i18n import gettext
+from sqlalchemy.orm import Session
 
 from bot.misc import bot_settings
+from auth import UserHandling
 
 _ = gettext
 
-async def button(admin: bool = False, username: str = None, password: str = None):
-    if admin:
+async def button(user_id: int, session: Session, username: str = None, password: str = None):
+    if await UserHandling(user_id, session).manager():
         keyboard = [
             [
                 KeyboardButton(
@@ -15,19 +17,53 @@ async def button(admin: bool = False, username: str = None, password: str = None
                         url = f"{bot_settings.web_app_url}/admin/login/{username}/{password}"
                     )
                 )
+            ],
+            [
+                KeyboardButton(text=_("🍽 Меню")),
+                KeyboardButton(text=_("➕ Добавить еду"))
+            ],
+            [
+                KeyboardButton(text=_("💸 Ежемесячный отчет"))
+            ],
+            [
+                KeyboardButton(text=_("✍️ Изменить еду")),
+                KeyboardButton(text=_("❌ Удалит еду"))
+            ],
+            [
+                KeyboardButton(text=_("📨 Отправьте пользователей к сегодняшнему меню")),
+                KeyboardButton(text=_("📥 Отправить сообщение"))
+            ],
+            [
+                KeyboardButton(text=_("⚙️ Настройки"))
             ]
         ]
-    else:
+        
+    elif await UserHandling(user_id, session).cook(True):
+        keyboard = [
+            [
+                KeyboardButton(text=_("🍽 Меню")),
+                KeyboardButton(text=_("➕ Добавить еду"))
+            ],
+            [
+                KeyboardButton(text=_("📨 Отправьте пользователей к сегодняшнему меню"))
+            ],
+            [
+                KeyboardButton(text=_("✍️ Изменить еду")),
+                KeyboardButton(text=_("❌ Удалит еду"))
+            ],
+            [
+                KeyboardButton(text=_("⚙️ Настройки"))
+            ]
+        ]
+
+    elif await UserHandling(user_id, session).user(True):
         keyboard = [
             [
                 KeyboardButton(text = _("🍽 Меню"))
             ],
             [
                 KeyboardButton(text = _("🔄 История заказов")),
-                KeyboardButton(text = _("Филиалы"))
-            ],
-            [
-                KeyboardButton(text = _("📍 Мои местоположения"))
+                KeyboardButton(text = _("📍 Локации"))
             ],
             [
                 KeyboardButton(text = _("✍️ Оставить отзыв")),

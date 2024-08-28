@@ -2,7 +2,6 @@ from aiogram import types, html
 from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.i18n import gettext
-import logging
 
 from bot.routers import users as router
 from bot.decorators import create_session
@@ -29,6 +28,7 @@ async def start_handler(message: types.Message, state: FSMContext, session: Sess
 
     if await UserHandling(**data).not_started_bot():
         await state.set_state(RegisterState.langauge)
+
         await message.answer(
             text=f"""{html.bold("Salom / Привет")} 👋
 
@@ -41,14 +41,30 @@ async def start_handler(message: types.Message, state: FSMContext, session: Sess
                 text=f"""{html.bold(_("Привет") + " " + message.from_user.first_name)} 👋
 
 {html.bold(_("Выберите нужный раздел 👇"))}""",
-                reply_markup = await start.button()
+                reply_markup = await start.button(message.from_user.id, session)
             )
+
         elif await UserHandling(**data).manager():
-            staff = await repo.StaffsTableRepository().get_staff(user_id=message.from_user.id,
-                                                                 session=session)
+            staff = await repo.StaffsTableRepository().get_staff(
+                user_id=message.from_user.id,                                                 
+                session=session
+            )
             await message.answer(
                 text=f"""{html.bold(_("Привет Админ -") + " " + message.from_user.first_name)} 👋
 
 {html.bold(_("Выберите нужный раздел 👇"))}""",
-                reply_markup = await start.button(True, staff.dashboard_username, staff.dashboard_password)
+                reply_markup = await start.button(
+                    **data, 
+                    username=staff.dashboard_username, 
+                    password=staff.dashboard_password
+                )
             )
+
+        elif await UserHandling(**data).cook(True):
+            await message.answer(
+                text=f"""{html.bold(_("Привет Шеф-повар -") + " " + message.from_user.first_name)} 👋
+
+{html.bold(_("Выберите нужный раздел 👇"))}""",
+                reply_markup = await start.button(**data)
+            )
+

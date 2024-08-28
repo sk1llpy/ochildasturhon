@@ -11,6 +11,16 @@ services:
     depends_on:
       - db
 
+  react:
+    build:
+      context: ./web/
+      dockerfile: dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web:/app/
+    command: npm run dev
+
   bot:
     build: .
     command: python3 -m bot polling

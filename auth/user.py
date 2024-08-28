@@ -1,7 +1,7 @@
 from db import repository as repo
 from sqlalchemy.orm import Session
 from apps.general.choices import StaffType
-
+import logging
 
 roles_rating = {
     "courier": 1,
@@ -36,20 +36,11 @@ class UserHandling:
         else:
             return False
 
-    async def courier(self, only: bool = False):
-        return await self._check_role(StaffType.courier, only)
-
     async def cook(self, only: bool = False):
         return await self._check_role(StaffType.cook, only)
 
-    async def call_center(self, only: bool = False):
-        return await self._check_role(StaffType.call_center, only)
-
     async def manager(self, only: bool = False):
         return await self._check_role(StaffType.manager, only)
-
-    async def admin(self, only: bool = False):
-        return await self._check_role(StaffType.admin, only)
 
     async def ceo(self, only: bool = False):
         return await self._check_role(StaffType.ceo, only)
@@ -60,7 +51,8 @@ class UserHandling:
             if only:
                 return self.staff_data.role == role
             else:
-                return roles_rating[self.staff_data.role] <= roles_rating[role]
+                return ((roles_rating[self.staff_data.role] > roles_rating[role])
+                        or (self.staff_data.role == role))
         else:
             return False
 

@@ -17,6 +17,8 @@ class UsersTable(BaseModel):
     banned: Mapped[bool] = mapped_column(default=False)
 
     admins: Mapped[list["StaffsTable"]] = relationship(back_populates="user")
+    baskets: Mapped[list["BasketsTable"]] = relationship(back_populates="user")
+    orders: Mapped[list["OrdersTable"]] = relationship(back_populates="user")
 
 
 class StaffsTable(BaseModel):

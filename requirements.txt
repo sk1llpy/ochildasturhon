@@ -8,3 +8,4 @@ environs
 psycopg2
 django-unfold
 pytz
+Pillow
